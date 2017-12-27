@@ -4,6 +4,10 @@ metadata:
   name: logspout
   namespace: kube-system
 spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -15,7 +19,7 @@ spec:
       containers:
       - resources:
           limits:
-            memory: 128Mi
+            memory: 64Mi
         securityContext:
           privileged: true
         env:
@@ -25,8 +29,6 @@ spec:
           value: '{{ index .Container.Config.Labels "io.kubernetes.pod.namespace" }}.{{ index .Container.Config.Labels "io.kubernetes.container.name" }}'
         - name: SYSLOG_FORMAT
           value: rfc3164
-        - name: DEBUG
-          value: "false"
         - name: ROUTE_URIS
           valueFrom:
             secretKeyRef:
