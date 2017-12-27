@@ -11,3 +11,10 @@ You can encode the uri as follows:
 ```
 echo syslog+tcp://example.com:514 | base64
 ```
+
+Then,
+
+
+```
+kubectl apply -f .
+```
