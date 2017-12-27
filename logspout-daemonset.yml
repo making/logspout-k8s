@@ -37,7 +37,12 @@ spec:
         volumeMounts:
         - name: log
           mountPath: /var/run/docker.sock
+        - name: tz-config
+          mountPath: /etc/localtime
       volumes:
       - name: log
         hostPath:
           path: /var/run/docker.sock
+      - name: tz-config
+        hostPath:
+           path: /usr/share/zoneinfo/Asia/Tokyo
