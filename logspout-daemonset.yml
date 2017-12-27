@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: logspout-daemonset
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        name: logspout
+    spec:
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      containers:
+      - resources:
+          limits:
+            memory: 128Mi
+        securityContext:
+          privileged: true
+        env:
+        - name: SYSLOG_TAG
+          value: '{{ index .Container.Config.Labels "io.kubernetes.pod.namespace" }}[{{ index .Container.Config.Labels "io.kubernetes.pod.name" }}]'
+        - name: SYSLOG_HOSTNAME
+          value: '{{ index .Container.Config.Labels "io.kubernetes.container.name" }}'
+        - name: SYSLOG_FORMAT
+          value: rfc3164
+        - name: DEBUG
+          value: "false"
+        - name: ROUTE_URIS
+          valueFrom:
+            secretKeyRef:
+              name: logspout-secret
+              key: route-uri
+        image: gliderlabs/logspout:v3.2.3
+        name: logspout
+        volumeMounts:
+        - name: log
+          mountPath: /var/run/docker.sock
+      volumes:
+      - name: log
+        hostPath:
+          path: /var/run/docker.sock
