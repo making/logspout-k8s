@@ -20,9 +20,9 @@ spec:
           privileged: true
         env:
         - name: SYSLOG_TAG
-          value: '{{ index .Container.Config.Labels "io.kubernetes.pod.namespace" }}[{{ index .Container.Config.Labels "io.kubernetes.pod.name" }}]'
+          value: '{{ index .Container.Config.Labels "io.kubernetes.pod.name" }}'
         - name: SYSLOG_HOSTNAME
-          value: '{{ index .Container.Config.Labels "io.kubernetes.container.name" }}'
+          value: '{{ index .Container.Config.Labels "io.kubernetes.pod.namespace" }}.{{ index .Container.Config.Labels "io.kubernetes.container.name" }}'
         - name: SYSLOG_FORMAT
           value: rfc3164
         - name: DEBUG
