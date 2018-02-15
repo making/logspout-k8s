@@ -39,6 +39,7 @@ spec:
         volumeMounts:
         - name: log
           mountPath: /var/run/docker.sock
+          readOnly: true
         - name: tz-config
           mountPath: /etc/localtime
       volumes:
