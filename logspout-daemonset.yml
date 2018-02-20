@@ -1,3 +1,38 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logspout
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: logspout
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespace
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: logspout
+roleRef:
+  kind: ClusterRole
+  name: logspout
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: logspout
+  namespace: kube-system
+---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
@@ -13,6 +48,7 @@ spec:
       labels:
         name: logspout
     spec:
+      serviceAccountName: logspout
       hostPID: true
       hostIPC: true
       hostNetwork: true
