@@ -33,12 +33,15 @@ subjects:
   name: logspout
   namespace: kube-system
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
   name: logspout
   namespace: kube-system
 spec:
+  selector:
+    matchLabels:
+      name: logspout
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 1
