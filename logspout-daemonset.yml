@@ -74,7 +74,8 @@ spec:
             secretKeyRef:
               name: logspout-secret
               key: route-uri
-        image: gliderlabs/logspout:v3.2.3
+        # image: gliderlabs/logspout:v3.2.3
+        image: harbor-13-78-118-111.sslip.io/library/logspout:v3.2.3-custom-ca
         name: logspout
         volumeMounts:
         - name: log
