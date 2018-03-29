@@ -51,6 +51,9 @@ spec:
       labels:
         name: logspout
     spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
       serviceAccountName: logspout
       containers:
       - resources:
@@ -64,7 +67,8 @@ spec:
         - name: SYSLOG_HOSTNAME
           value: '{{ index .Container.Config.Labels "io.kubernetes.pod.namespace" }}.{{ index .Container.Config.Labels "io.kubernetes.container.name" }}'
         - name: SYSLOG_FORMAT
-          value: rfc3164
+          # value: rfc3164
+          value: rfc5424
         - name: ROUTE_URIS
           valueFrom:
             secretKeyRef:
