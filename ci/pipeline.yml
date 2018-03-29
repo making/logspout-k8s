@@ -1,0 +1,57 @@
+resources:
+- name: logspout
+  type: git
+  source:
+    uri: https://github.com/gliderlabs/logspout.git
+    tag_filter: v3.*.*
+- name: docker
+  type: docker-image
+  source:
+    repository: ((harbor-hostname))/library/logspout
+    username: ((harbor-username))
+    password: ((harbor-password))
+jobs:
+- name: docker-push
+  plan:
+  - aggregate:
+    - get: logspout
+      trigger: true
+  - task: update-docker
+    params:
+      CA_CERT: ((ca-cert))
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: ubuntu
+      inputs:
+      - name: logspout
+      outputs:
+      - name: updated 
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e
+          shopt -s dotglob
+          mv -f logspout/* updated/
+          cat <<EOF > updated/custom-ca.crt
+          ${CA_CERT}
+          EOF
+          cat <<EOF >> updated/Dockerfile
+          RUN apk add -U --virtual build-dependencies ca-certificates
+          ADD custom-ca.crt /usr/local/share/ca-certificates/custom-ca.crt
+          RUN update-ca-certificates \
+            && apk del build-dependencies \
+            && rm -rf /var/cache/apk/*
+          EOF
+          echo `cat updated/VERSION`-custom-ca > updated/custom-version
+          cat updated/Dockerfile
+  - put: docker
+    params:
+      build: updated
+      tag: updated/custom-version
+      tag_as_latest: true
+
